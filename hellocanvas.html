@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>homework1</title>
+</head>
+<body>
+<canvas id="drawing">A Drawing of something</canvas>
+<script>
+ document.write("<p>Hello World!</p>");
+var drawing=document.getElementById("drawing");
+if(drawing.getContext){
+var context=drawing.getContext("2d");
+//绘制红色矩形
+context.fillStyle="red";
+context.fillRect(10,10,50,50);
+//绘制线
+context.strokeStyle="blue";
+context.lineTo(10,90);
+context.lineTo(90,90);
+context.stroke();
+}
+</script>
+</body>
+</html>
