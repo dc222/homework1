@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <script type="javascript"></script>
+    <title>跳马</title>
+</head>
+<body>
+    <table border="1" WIDTH=500px HEIGHT=100px align="center" name="initTable">
+        <tr>
+             <td>
+                棋盘行数m
+            </td>
+            <td>
+                棋盘列数n
+            </td>
+            <td>
+                初始x(x>=0)
+            </td>
+            <td>
+                初始y(y>=0)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="number" min="2" max="20" id="M" value="3">
+            </td>
+            <td>
+                <input type="number" min="2" max="20" id="N" value="4">
+            </td>
+            <td>
+                <input type="number" min="1" max="20" id="X" value="0">
+            </td>
+            <td>
+                <input type="number" min="1" max="20" id="Y" value="0">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="button" id="cal" onclick="getResult()"  value="计算">
+            </td>
+        </tr>
+    </table>
+    <table border="1" WIDTH=500px HEIGHT=500px align="center">
+        <tr>
+            <td>
+                路径
+                <r id="re" width=500px>
+                 </r>               
+            </td>
+        </tr>
+    </table>
+     <script type="text/javascript">
+var dxy = new Array;
+dxy = [[1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]];
+var trace = new Array;
+var num = 1;
+var wroute = new Array;
+var count = 0;
+var X0;
+var y0;
+var m;
+var n;
+var route = new Array();
+//初始化
+function getResult() {
+    wroute.splice(0,wroute.length);
+    count=0;
+    m = parseInt(document.getElementById("M").value);
+    n = parseInt(document.getElementById("N").value);
+    X0 = parseInt(document.getElementById("X").value);
+    Y0 = parseInt(document.getElementById("Y").value);
+   
+    var reroute = new Array;
+    for (var i = 0; i < m; i++) {
+        route[i] = new Array();
+        for (var j = 0; j < n; j++) {
+            route[i][j] = 0;
+        }
+    }
+    reroute = froute()//找到路线
+    document.getElementById("re").innerHTML ="一共有" + count + "条分别是:" + "<br>";
+    for (var i = 0; i < count; i++) {
+        for (var j = 1; j < reroute[i].length; j++) {
+            if (j == reroute[i].length - 1) {
+                document.getElementById("re").innerHTML += reroute[i][j]+"<br>";
+            } else {
+                document.getElementById("re").innerHTML += reroute[i][j] + "->";
+            }
+        }
+        
+       
+    }
+   
+}
+
+function isPass(x, y, i) {//判断是否能够跳出下一步
+    if ((x + dxy[i][0]) < m && (x + dxy[i][0]) >= 0 && y + dxy[i][1] < n && y + dxy[i][1] >= 0) {
+        var tempx = 0;
+        var tempy = 0;
+        tempx = x + dxy[i][0];
+        tempy = y + dxy[i][1];
+        if (route[tempx][tempy] == 0 || (tempx == X0 && tempy == Y0)) {
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
+//判断是否越界
+function isBorder() {
+    for (var i = 0; i < m; i++) {
+        if (route[i][0] != 0 || route[i][n - 1] != 0) {
+            return true;
+        }
+    }
+    for (var i = 0; i < n; i++) {
+        if (route[0][i] != 0 || route[m - 1][i] != 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function froute() {//得出路线
+    f(X0, Y0, num);
+    return wroute;
+}
+//递归
+function f(x, y, t) {
+    if (x == X0 && y == Y0 && t != 1) {
+        if (isBorder()) {
+            var tempTrace = new Array();
+            count++;
+            for (var i = 1; i < num; i++) {
+                var tempx = trace[i][0];
+                var tempy = trace[i][1];
+                tempTrace[i] = new Array();
+                tempTrace[i][0] = tempx;
+                tempTrace[i][1] = tempy;
+            }
+            tempTrace[num] = new Array();
+            tempTrace[num][0] = X0;
+            tempTrace[num][1] = Y0;
+            wroute.push(tempTrace);
+        }
+    }
+    else {
+        for (var i = 0; i < 8; i++) {
+            if (isPass(x, y, i)) {
+                trace[num] = new Array();
+                trace[num][0] = x;
+                trace[num][1] = y;
+                route[x][y] = num;
+                num++;
+                f(x + dxy[i][0], y + dxy[i][1], num);
+                num--;
+                route[x][y] = 0;
+                trace[num][0] = 0;
+                trace[num][1] = 0;
+            }
+        }
+    }
+}
+    </script>
+</body>
+
+</html>
