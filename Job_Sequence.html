@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript"></script>
+    <title>Job_Sequence</title>
+</head>
+<body>
+    <table border="1" WIDTH=500px HEIGHT=100px align="center" name="initTable">
+        <tr>
+             <td>
+                任务编号
+            </td>
+            <td>
+                费时
+            </td>
+            <td>
+                最后完成期限
+            </td>
+            <td>
+                价值
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="number"  id="id0" value="1">
+            </td>
+            <td>
+                <input type="number" id="time0" value="4">
+            </td>
+
+            <td>
+                <input type="number"  id="ddl0" value="10">
+            </td>
+
+            <td>
+                <input type="number" id="v0" value="2">
+            </td>
+        </tr>
+<tr>
+            <td>
+                <input type="number"  id="id1" value="2">
+            </td>
+            <td>
+                <input type="number" id="time1" value="3">
+            </td>
+
+            <td>
+                <input type="number"  id="ddl1" value="8">
+            </td>
+
+            <td>
+                <input type="number" id="v1" value="3">
+            </td>
+        </tr>
+<tr>
+            <td>
+                <input type="number"  id="id2" value="3">
+            </td>
+            <td>
+                <input type="number" id="time2" value="2">
+            </td>
+
+            <td>
+                <input type="number"  id="ddl2" value="4">
+            </td>
+
+            <td>
+                <input type="number" id="v2" value="3">
+            </td>
+        </tr>
+<tr>
+            <td>
+                <input type="number"  id="id3" value="4">
+            </td>
+            <td>
+                <input type="number" id="time3" value="1">
+            </td>
+
+            <td>
+                <input type="number"  id="ddl3" value="2">
+            </td>
+
+            <td>
+                <input type="number" id="v3" value="6">
+            </td>
+        </tr>
+         <tr>
+            <td>
+                <input type="button" id="cal" onclick="getValue();getResult();"  value="计算">
+            </td>
+        </tr>
+    </table>
+    <table border="1" WIDTH=500px HEIGHT=500px align="center">
+        <tr>
+            <td>
+               最佳工作序列：
+                <r id="result" width=500px>
+                 </r>               
+            </td>
+        </tr>
+    </table>
+<script type="text/javascript">
+
+     var work=new array();
+     var temp=new array();
+     var id=null;
+     var time=null;
+     var ddl=null;
+     var v=null;
+	for(var i=0;i<5;i+=1)
+	{	
+		temp[i] = new Array();
+		for(var j=0;j<5;j+=1)
+        temp[i][j] = 0;
+	}
+
+function getMaxddl()
+	{
+		var max = 0;
+		for (var i = 0; i < 4; i+=1)
+		{
+			if (work[i].ddl > max)
+				max = work[i].ddl;
+		}	
+		return max;
+	}
+     function getValue(){
+         var id0=parseInt(document.getElementById("id0").value);
+         var id1=parseInt(document.getElementById("id1").value);
+         var id2=parseInt(document.getElementById("id2").value);
+         var id3=parseInt(document.getElementById("id3").value);
+         var time0=parseInt(document.getElementById("time0").value);
+         var time1=parseInt(document.getElementById("time1").value);
+         var time2=parseInt(document.getElementById("time2").value);
+         var time3=parseInt(document.getElementById("time3").value);
+         var ddl0=parseInt(document.getElementById("ddl0").value);
+         var ddl1=parseInt(document.getElementById("ddl1").value);
+         var ddl2=parseInt(document.getElementById("ddl2").value);
+         var ddl3=parseInt(document.getElementById("ddl3").value);
+         var v0=parseInt(document.getElementById("v0").value);
+         var v1=parseInt(document.getElementById("v1").value);
+         var v2=parseInt(document.getElementById("v2").value);
+         var v3=parseInt(document.getElementById("v3").value);
+         
+         work[0]={'id':id0,'time':time0,'ddl':ddl0,'v':v0};
+         work[1]={'id':id1,'time':time1,'ddl':ddl1,'v':v1};
+         work[2]={'id':id2,'time':time2,'ddl':ddl2,'v':v2};
+         work[3]={'id':id3,'time':time3,'ddl':ddl3,'v':v3};
+         work.sort(function(a,b){
+             if(a.ddl<b.ddl)return -1;
+             else return 1;
+	})
+     }
+     
+     function getResult()
+     {
+         max=getMaxddl();
+         for (var i = 0; i <= 4; i+=1)
+             temp[i][0] = 0;
+         for (var j = 0; j <= max; j+=1)
+             temp[0][j] = 0;
+         for (var i = 1; i <= 4; i+=1)
+         {
+             for (var j = 1; j <= max; j+=1)
+             {
+                 if (j >= work[i - 1].time && temp[i - 1][j - work[i - 1].time] + work[i - 1].v > temp[i - 1][j])
+                 {
+                     if (j <= work[i - 1].ddl)
+                     temp[i][j] = temp[i - 1][j - work[i - 1].time] + work[i - 1].v;
+                     else
+                         temp[i][j] = temp[i][j - 1];
+                 }
+                 else
+                 {
+                    temp[i][j] = temp[i - 1][j];
+                 }
+             }
+         }
+         var order = new Array(5);
+         //计算工作序列
+         var j = max;
+         for (var i = 4; i > 0; i-=1)
+         {
+             if (temp[i][j] > temp[i - 1][j])
+             {
+                order[i - 1] = 1;
+                 j = j - work[i - 1].time;
+             }
+             else
+             {	
+                 order[i-1] = 0;
+             }
+         }
+         var str =null;		
+         for (var i = 0; i < 4; i+=1)
+         {
+             if (order[i])
+             {
+                 str += work[i].id + "  ";
+             }
+         }
+       
+         str += "总价值为：";
+         str += temp[4][max].toString();
+         document.getElementById('result').innerHTML  = str;
+     }
+     </script>
+</body>
+</html>
+     
