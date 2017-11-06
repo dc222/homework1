@@ -1,0 +1,266 @@
+<html>
+    <head>
+        <title>Jiangsu_Area</title>
+    </head>
+        <body>
+            
+            <p>
+                读取地图：<input type="file" id="fileinput" >
+                <input type="submit" id="button2"  value="确定" onclick="readfile()">
+            </p>
+            <p>
+                    <input type="submit" id="button3"  value="绘制地图" onclick="Paint(canvas1)">
+                <input type="submit" id="button4" value="墨卡托投影面积" onclick="Mercator_area()">
+                <input type="submit" id="button5" value="墨卡托投影反算" onclick="Fanjie(canvas1)">
+                <input type="submit" id="button6" value="基于经纬度坐标计算各市面积" onclick="ll_area()">
+            </p> 
+            <p id="demo"></p>
+                <canvas name=canvas1></canvas>
+        </body>
+        <script>
+            //画笔颜色和大小
+            var pen='black';
+            var count=2;
+            var MAXAMOUNT=100000;
+            var canvas1=document.getElementsByName("canvas1")[0];
+            var x=new Array();
+            var y=new Array();
+            for(var i=0;i<MAXAMOUNT;i++)
+            {
+                x[i]=-1;
+                y[i]=-1;
+            }
+            //创建坐标变换之后的数组，并初始化
+            var angx=new Array();
+            var angy=new Array();
+            for(var i=0;i<MAXAMOUNT;i++)
+            {
+                angx[i]=-1;
+                angy[i]=-1;
+            }
+            //创建画布坐标数组，并初始化
+            var paintx=new Array();
+            var painty=new Array();
+            for(var i=0;i<MAXAMOUNT;i++)
+            {
+                paintx[i]=-1;
+                painty[i]=-1;
+            }
+            function Init(canvas)
+            {
+              
+              canvas.width = 561;
+              canvas.height = 561;
+              if(canvas.getContext)
+              {
+                var ctx = canvas.getContext("2d"),
+                width = canvas.width,
+                height = canvas.height;
+                ctx.lineWidth = 2;
+              }
+            }
+            //读取文件并存入数组
+            function readfile()
+            {  
+                var file=document.getElementById("fileinput").files[0];
+                var reader=new FileReader();
+                reader.readAsText(file);
+                reader.onload = function (e) 
+                {
+                    var fileText = e.target.result.split("\n");
+                    for(var i=0;i<fileText.length;i++)
+                    {
+                        if(fileText[i].length>4) //排除编号和END的情况
+                        {
+                            var arr=fileText[i].split(",");//分割x,y坐标
+                            x[i]=arr[0];
+                            y[i]=arr[1];
+                        }
+                        else
+                        {
+                            y[i]=-1;
+                            x[i]=-1;
+                        }
+                    }
+                }
+    
+            }  
+            //绘制江苏省地图
+            function Paint(canvas)
+            { 
+                Init(canvas);
+               
+                for (var i=0;i<MAXAMOUNT;i++)
+                {
+                    if(x[i]!=-1)
+                    {
+                        paintx[i]=x[i]/100000-128;
+                        painty[i]=560/6-(y[i]/100000+50);
+                    }
+                }
+                for(var i=0;i<MAXAMOUNT-1;i++)
+                {
+                    var ctx = canvas.getContext("2d"),
+                    width = canvas.width,
+                    height = canvas.height;
+                    ctx.lineWidth = count;
+                    ctx.strokeStyle = pen;
+                    if((paintx[i]!=-1)&&(paintx[i+1]!=-1))
+                    {
+                        ctx.beginPath();
+                        ctx.moveTo(paintx[i]*50,painty[i]*50);
+                        ctx.lineTo(paintx[i+1]*50,painty[i+1]*50);
+                        ctx.stroke();
+                    }
+                    
+                }
+            }
+            //墨卡托反解
+            function Fanjie(canvas)
+            {
+                Init(canvas);
+                var earthRad=6378245;
+                for(var i=0;i<MAXAMOUNT;i++)
+                {
+                    if(x[i]!=-1)
+                    {
+                        angx[i]=x[i]/20037508.34*180;
+                        angy[i]=y[i]/20037508.34*180;
+                        angy[i]=180/Math.PI*(2*Math.atan(Math.exp(angy[i]*Math.PI/180))-Math.PI/2);
+                    }
+                }
+                //绘制转换后的地图
+                for(var i=0;i<MAXAMOUNT;i++)
+                {
+                    if(paintx[i]!=-1)
+                    {
+                        painty[i]=180-(angy[i]+143);
+                        paintx[i]=angx[i]-115;
+                    }
+                }
+                for(var i=0;i<MAXAMOUNT-1;i++)
+                {
+                    var ctx = canvas.getContext("2d"),
+                    width = canvas.width,
+                    height = canvas.height;
+                    ctx.lineWidth = count;
+                    ctx.strokeStyle = pen;
+                    if((paintx[i]!=-1)&&(paintx[i+1]!=-1))
+                    {
+                        ctx.beginPath();
+                        ctx.moveTo(paintx[i]*50,painty[i]*50);
+                        ctx.lineTo(paintx[i+1]*50,painty[i+1]*50);
+                        ctx.stroke();
+                    }
+                    
+                }
+            }
+            //创建数组存储面积
+            var area=new Array();
+            for(var i=0;i<20;i++)
+            {
+                area[i]=0;
+            }
+            //基于墨卡托计算各市面积
+            function Mercator_area()
+            {
+                var temp=0;var count=0;
+                for(var i=0;i<MAXAMOUNT-1;i++)
+                {
+                    if((x[i]!=-1)&(y[i+1]!=-1))
+                    {
+                        //梯形的计算公式
+                        var a1=parseFloat(y[i+1])+parseFloat(y[i]);
+                        var b1=parseFloat(x[i+1]-x[i]);
+                        temp=temp+a1*b1/2/1000000; //梯形法进行面积累加
+                    }
+                    else
+                    {
+                        if(temp!=0)
+                        {
+                            area[count]=Math.abs(temp); 
+                            count++;
+                        }
+                        temp=0;
+                    }
+                }
+                var write_text='计算结果如下：'+"<br>";
+                var total=0;
+                for(var i=0;i<20;i++)
+                {
+                    total+=area[i];
+                }
+                total=total.toFixed(2);
+                for (var i=0;i<20;i++)
+                {
+                    if(area[i]!=0)
+                    {
+                        area[i]=area[i].toFixed(2);
+                        write_text+="面积:"+area[i].toString()+"<br>";  //显示计算结果 
+                    } 
+                }
+                document.getElementById("demo").innerHTML = write_text+"<br>"+"<br>"+"总面积："+total.toString()+"单位：km2";   
+            }
+            //基于经纬度坐标计算各市面积
+            function ll_area()
+            {
+                var temp=0;
+                var count=0;
+                //用于计算的参数
+                var ae=6378245;var e1e1=0.006693421622966;
+                for(var i=0;i<MAXAMOUNT-1;i++)
+                {
+                    if((angx[i]!=-1)&(angy[i+1]!=-1))
+                    {
+                        var delta_y=(angy[i+1]-angy[i])*Math.PI/180;
+                        var y_m=(angy[i+1]+angy[i])/2*Math.PI/180;
+                        var K=2*ae*ae*(1-e1e1)*(angx[i+1]-angx[i])*Math.PI/180;
+                        //计算两个相邻坐标点的经纬线所围成的梯形的面积。
+                        temp=temp+10*K*(1.0033636057*Math.sin(delta_y/2)
+                        *Math.cos(y_m)-0.0011240272*Math.sin(3*delta_y/2)
+                        *Math.cos(3*y_m)+0.0000016989*Math.sin(5*delta_y/2)
+                        *Math.cos(5*y_m)-0.0000000027*Math.sin(7*delta_y/2)
+                        *Math.cos(7*y_m));
+                        //取梯形的一半作为大梯形的一部分
+                        temp=temp/2;
+                        //计算一点与赤道所围成的梯形的面积，作为大梯形的另一部分
+                        temp+=10*2*ae*ae*(1-e1e1)*(angx[i+1]-angx[i])
+                        *Math.PI/180*(1.0033636057*Math.sin(angy[i+1]*Math.PI/180/2)
+                        *Math.cos(angy[i+1]/2*Math.PI/180)-0.0011240272
+                        *Math.sin(3*angy[i+1]*Math.PI/180/2)*Math.cos(3*angy[i+1]/2*Math.PI/180)
+                        +0.0000016989*Math.sin(5*angy[i+1]*Math.PI/180/2)
+                        *Math.cos(5*angy[i+1]/2*Math.PI/180)-0.0000000027
+                        *Math.sin(7*angy[i+1]*Math.PI/180/2)
+                        *Math.cos(7*angy[i+1]/2*Math.PI/180));
+                        temp=temp/1000000;
+                    }
+                    else
+                    {
+                        if(temp!=0)
+                        {
+                            area[count]=Math.abs(temp);
+                            count++;
+                        }
+                        temp=0;
+                    }
+                      
+                }
+                var write_text='计算结果如下：'+"<br>";
+                var total=0;
+                for(var i=0;i<20;i++)
+                {
+                    total+=area[i];
+                }
+                total=total.toFixed(2);
+                for (var i=0;i<20;i++)
+                {
+                    if(area[i]!=0)
+                    {
+                         area[i]=area[i].toFixed(2);
+                        write_text+="面积:"+area[i].toString()+"<br>";  //显示计算结果 
+                    } 
+                }
+                document.getElementById("demo").innerHTML = write_text+"<br>"+"<br>"+"总面积："+total.toString()+"单位：km2"; 
+            }
+        </script>
+</html>
