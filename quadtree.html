@@ -1,0 +1,124 @@
+<html>
+    <head>
+        <title>Quadtree</title>
+    </head>
+        <body>
+            <p>
+                选择文件:<input type="file" id="file" >
+            </p>
+            <p>
+                <input type="submit" id="button1"  value="确定" onclick="readfile()">
+                <input type="submit" id="button2"  value="求M码" onclick="MortonCode()">
+            </p>
+            
+            <p id="demo1"></p>
+            <p id="demo"></p>
+            
+            <table width="1000" height="700" border="1">
+              
+            </table>
+        </body>
+            <script>
+              
+                var n;
+           
+                var x=new Array();
+                var v=new Array();
+                
+                for(var i=0;i<10;i++){
+                    v[i]=new Array();
+                    x[i]=new Array();
+                    for(var j=0;j<10;j++){
+                        x[i][j]=0;
+                        v[i][j]=0;
+                    }
+                }
+                //读取文件并存入数组
+                function readfile()
+                {
+                    
+                    var file=document.getElementById("file").files[0];
+                    var reader=new FileReader();
+                    reader.readAsText(file);
+                    reader.onload = function (e) 
+                    {
+                        //以换行标志作为分隔符
+                        var fileText = e.target.result.split("\n");
+                        var flag=fileText[0].split(",");
+                         n=parseInt(flag[0]);
+                        
+                       
+                        for(var i=1;i<fileText.length;i++)
+                        {
+                                var arr=fileText[i].split(",");//将编号、x、y分隔开
+                                for(var j=0;j<arr.length;j++){
+                                x[i-1][j]=arr[j];
+                                document.getElementById("demo1").innerHTML+=x[i-1][j]+' ';
+                                }
+                                document.getElementById("demo1").innerHTML+='<br/>'
+
+                        }  
+                    }
+        
+                }  
+               
+           
+            
+                function MortonCode()
+                {
+                 for(var i=0;i<n;i++){
+                     for(var j=0;j<n;j++){
+                         var a=i.toString(2);
+                         var ai=parseInt(a);
+                         var b=j.toString(2);
+                         var bi=parseInt(b);
+                         v[i][j]=2*ai+bi;
+                         
+                     }
+                  
+                 }
+                    for(var i=0;i<n;i+=2){
+                            for(var j=0;j<n;j+=2){
+                                if(x[i][j]==x[i+1][j]&&x[i][j]==x[i+1][j+1]&&x[i][j]==x[i][j+1]){
+                                    var ii=i/2;
+                                    var jj=j/2;
+                                    var a=ii.toString(2);
+                                    var ai=parseInt(a);
+                                    var b=jj.toString(2);
+                                    var bi=parseInt(b);
+                                    v[i][j]=2*ai+bi;
+                                    v[i+1][j+1]=v[i][j];
+                                    v[i][j+1]=v[i][j];
+                                    v[i+1][j]=v[i][j];
+                                }
+                                
+                            }
+                        }
+                     
+                        for(var i=0;i<n;i+=4){
+                            for(var j=0;j<n;j+=4){
+                                if(v[i][j]==v[i+1][j+1]&&v[i+2][j+2]==v[i+3][j+3]){
+                                    if(x[i][j]==x[i+2][j+2]&&x[i][j]==x[i][j+2]&&x[i][j]==x[i+2][j]){
+                                        for(var m=i;m<i+4;m++){
+                                            for (var k=j;k<j+4;k++){
+                                                v[m][k]=v[i][j];
+                                            }
+                                        }
+                                   
+                                    }
+                                }  
+                            }
+                        }
+                        for(var i=0;i<n;i++){
+                            for (var j=0;j<n;j++){
+                                document.getElementById("demo").innerHTML+=v[i][j]+' ';
+                            }
+                            document.getElementById("demo").innerHTML+='<br\>';
+                            
+                        }
+                        
+                 }
+                
+            </script>
+    </html>
+       
