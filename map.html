@@ -1,0 +1,323 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            map
+        </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+        canvas
+        {
+            margin: 10px;
+            border: 1px solid #000000;
+            display:inline;
+        }
+    </style>
+
+    </head>
+
+    <body>
+        <input type="file" name="files" value="选择文件" id="path" multiple="true"/>
+        <input type="button" value="绘制" onclick="Draw()"/>
+        <br>
+
+        <canvas id="1"></canvas >
+        
+        <div id="aa"></div>
+        
+        <script>
+            var filename;
+            function Draw(event) 
+            {
+                var file=document.getElementById("path").files;
+                var obj = document.getElementById("path");
+                var len = obj.files.length;
+                for (var i = 0; i < len; i++) 
+                {
+                    filename = obj.files[i].name;
+                    var myfile = file[i];
+                    var reader = new FileReader();
+                    reader.readAsText(myfile);
+                    var content = null;
+                    var n=0;
+                    reader.onload = function(event) 
+                    {
+                        filename = obj.files[n].name;
+                        content=this.result;  
+                        drawline(content);
+                        n++;
+                    }
+                }
+            }
+            var canvas = document.getElementById("1");
+            canvas.width = 800;
+            canvas.height = 550;
+            var ctx = canvas.getContext("2d");
+            var pointx=new Array();
+            var pointy=new Array();
+            function drawline(content)
+            {
+                var text=content.split("\r\n");
+                var num=0;//序号
+                var p=0;
+                
+                if(canvas.getContext)
+                {  
+          
+                    for(var i=0;i<text.length;i++)
+                    {
+                        var now=text[i];
+                        if(now.length<=2)//读到序号
+                        {
+                            continue;
+                        }
+                        if(now=="END")
+                        {
+                            if(filename == "vegrgn.gen")
+                            {
+                                drawvegrgn(pointx,pointy);
+                            }
+                            else if(filename == "Building.gen")
+                            {
+                                drawbuilding(pointx,pointy);
+                            }
+                            else
+                            {
+                                return;
+                            }
+                                                        
+                            pointx = [];
+                            pointy = [];
+                            num++;
+                            p=0;
+                            continue;
+                        }
+                    
+                        else
+                        {
+                            var point=now.split(",");
+                            point[0] = parseFloat(point[0]) - 430000;
+                            point[1] = parseFloat(point[1]) - 3260000;
+                            pointx.push(point[0]);
+                            pointy.push(point[1]);
+                            if(p==0)
+                            {
+                            ctx.beginPath();
+                            if(filename == "vegrgn.gen")
+                            {
+                                ctx.strokeStyle="#6dbb43";
+                            }
+                            if(filename == "building.gen")
+                            {
+                                ctx.strokeStyle="blue";
+                            }
+                            
+                            ctx.lineWidth=1;
+                            ctx.moveTo(point[0] * 2.5 + 75,point[1] * 2.5 - 1000);
+                            p=1;
+                            continue;
+                            }
+                            if(p==1){
+                                ctx.lineTo(point[0] * 2.5 + 75,point[1] * 2.5 - 1000);
+                            }
+                            ctx.stroke();
+                            
+                        }
+                    }
+                }
+                
+            }   
+            function drawbuilding(pointx,pointy)
+            {
+                var xmin = 999999;
+                var ymin = 999999;
+                var xmax = 0;
+                var ymax = 0;
+                for(var i = 0; i < pointx.length; i++)
+                {
+                    if (pointx[i] < xmin)
+                    {
+                        xmin = pointx[i];
+                    }
+                    if (pointx[i] > xmax)
+                    {
+                        xmax = pointx[i];
+                    }
+                    if (pointy[i] < ymin)
+                    {
+                        ymin = pointy[i];
+                    }
+                    if (pointy[i] > ymax)
+                    {
+                        ymax = pointy[i];
+                    }
+                }
+              
+                for(var i = 0; i< (xmax + ymax);i++)
+                {
+                    var drawx = new Array();
+                    var drawy = new Array();
+                    var x0=xmin+i*5;
+                    var y0=ymin;
+                    var x1=xmin;
+                    var y1=ymin+i*5;
+                    var k1 = -1;
+                    var b1=y1-x1*k1;
+                    for(var j = 0; j < pointx.length-1; j++)
+                    {
+                        if(pointx[j + 1] != pointx[j])
+                        {
+                            var k2 = (pointy[j + 1] - pointy[j]) / (pointx[j + 1] - pointx[j]);
+                            var b2=pointy[j+1]-k2*pointx[j+1];
+                            var x = (b2 - b1) / (k1 - k2);
+                            var y = k1 * x + b1;
+                        }
+                        else{
+                            var x = pointx[j];
+                            var y = k1 * x + b1;
+                        }
+                        if((x <= pointx[j + 1] && x >= pointx[j])||(x >= pointx[j + 1] && x <= pointx[j]))
+                        {
+                            if((y <= pointy[j + 1] && y >= pointy[j])||(y >= pointy[j + 1] && y <= pointy[j])){
+                                drawx.push(x);
+                                drawy.push(y);
+                            }
+                        }
+                        
+                    }
+                    ctx.beginPath();
+                    ctx.strokeStyle="black";
+                    ctx.lineWidth=1;
+                    if(drawx.length>0){
+                        for(var k = 0; k < drawx.length; k = k + 2)
+                        {
+                            ctx.moveTo(drawx[k] * 2.5 + 75 , drawy[k] * 2.5 - 1000);
+                            ctx.lineTo(drawx[k+1] * 2.5 +75 , drawy[k+1] * 2.5 - 1000);
+                        }
+                        
+                    }
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+            }
+            
+            function drawvegrgn(pointx,pointy)
+            {
+                var xmin = 999999;
+                var ymin = 999999;
+                var xmax = 0;
+                var ymax = 0;
+                for(var i = 0; i < pointx.length; i++)
+                {
+                    if (pointx[i] < xmin)
+                    {
+                        xmin = pointx[i];
+                    }
+                    if (pointx[i] > xmax)
+                    {
+                        xmax = pointx[i];
+                    }
+                    if (pointy[i] < ymin)
+                    {
+                        ymin = pointy[i];
+                    }
+                    if (pointy[i] > ymax)
+                    {
+                        ymax = pointy[i];
+                    }
+                }
+              
+                for(var i = 0; i< (xmax + ymax);i++)
+                {
+                    var drawx = new Array();
+                    var drawy = new Array();
+                    var x0=xmin+i*5;
+                    var y0=ymin;
+                    var x1=xmin;
+                    var y1=ymin+i*5;
+                    
+                    var k1 = -1;
+                    var b1=y1-x1*k1;
+                    for(var j = 0; j < pointx.length-1; j++)
+                    {
+                        if(pointx[j + 1] != pointx[j])
+                        {
+                            var k2 = (pointy[j + 1] - pointy[j]) / (pointx[j + 1] - pointx[j]);
+                            var b2=pointy[j+1]-k2*pointx[j+1];
+                            var x = (b2 - b1) / (k1 - k2);
+                            var y = k1 * x + b1;
+                        }
+                        else{
+                            var x = pointx[j];
+                            var y = k1 * x + b1;
+                        }
+                        if((x <= pointx[j + 1] && x >= pointx[j])||(x >= pointx[j + 1] && x <= pointx[j]))
+                        {
+                            if((y <= pointy[j + 1] && y >= pointy[j])||(y >= pointy[j + 1] && y <= pointy[j])){
+                                drawx.push(x);
+                                drawy.push(y);
+                            }
+                        }
+                        
+                    }
+                    ctx.beginPath();
+                    ctx.lineWidth=1;
+                    if(drawx.length>0){
+                        for(var k = 0; k < drawx.length; k = k + 2)
+                        {
+                            var temp = 0;
+                            
+                            if(drawx[k]>drawx[k+1])
+                            {
+                                temp = drawx[k];
+                                drawx[k] = drawx[k+1];
+                                drawx[k+1]=temp;
+                                temp = drawy[k];
+                                drawy[k] = drawy[k+1];
+                                drawy[k+1]=temp;
+                                
+                            }
+                            var b = 1;
+                            for(var a=drawx[k];a<drawx[k+1];a=a+3)
+                            {
+                                if(b % 2 == 0)
+                                {
+                                    ctx.strokeStyle = "black";
+                                    ctx.moveTo(a * 2.5 + 75 , (a*k1+b1) * 2.5 - 1000);
+                                    ctx.lineTo(a * 2.5 + 76 , (a*k1+b1) * 2.5 - 1000);
+                                    ctx.moveTo(a * 2.5 + 77 , (a*k1+b1) * 2.5 - 999);
+                                    ctx.lineTo(a * 2.5 + 79 , (a*k1+b1) * 2.5 - 999);
+                                    ctx.moveTo(a * 2.5 + 80 , (a*k1+b1) * 2.5 - 1000);
+                                    ctx.lineTo(a * 2.5 + 81 , (a*k1+b1) * 2.5 - 1000);
+                                }
+                                else
+                                {
+                                    ctx.strokeStyle = "black";
+                                    ctx.moveTo(a * 2.5 + 75 , (a*k1+b1) * 2.5 - 1000);
+                                    ctx.lineTo(a * 2.5 + 76 , (a*k1+b1) * 2.5 - 1000);
+                                    ctx.moveTo(a * 2.5 + 77 , (a*k1+b1) * 2.5 - 999);
+                                    ctx.lineTo(a * 2.5 + 79 , (a*k1+b1) * 2.5 - 999);
+                                    ctx.moveTo(a * 2.5 + 80 , (a*k1+b1) * 2.5 - 1000);
+                                    ctx.lineTo(a * 2.5 + 81 , (a*k1+b1) * 2.5 - 1000);
+                                    ctx.stroke();
+                                    ctx.beginPath();
+                                    ctx.lineWidth=1;
+                                    ctx.strokeStyle = "black";
+                                    ctx.moveTo(a * 2.5 + 77 , (a*k1+b1) * 2.5 - 998);
+                                    ctx.lineTo(a * 2.5 + 79 , (a*k1+b1) * 2.5 - 998);
+                                    ctx.stroke();
+                                }
+                                b++;
+                                
+                            }
+                            
+                        }
+                    }
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+            }
+        </script>
+
+    </body>
+</html>
