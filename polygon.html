@@ -5,13 +5,13 @@
     </head>
 <body>
         <p>
-            选择多边形文件:<input type="file" id="fileinput" >
-            <input type="submit" id="button1"  value="确定" onclick="readfile()">
-            <input type="submit" id="button2"  value="绘制" onclick="paint_polygon(canvas1)"> 
+            Choose a file:<input type="file" id="fileinput" >
+            <input type="submit" id="button1"  value="Yes" onclick="readfile()">
+            <input type="submit" id="button2"  value="Draw polygon" onclick="paint_polygon(canvas1)"> 
         </p>
         <p>
-            <input type="submit" id="button3"  value="编号" onclick="main_function()">
-            <input type="submit" id="button4"  value="清空" onclick="clear_write()">
+            <input type="submit" id="button3"  value="Number" onclick="main_function()">
+            <input type="submit" id="button4"  value="Clear" onclick="clear_write()">
         </p>
         <p id="demo"></p>
         <canvas name=canvas1></canvas>
@@ -409,10 +409,10 @@
                   }
               }
               //显示运算结果
-              var result_string="构建的多边形如下："+"<br>";
+              var result_string="Polygon："+"<br>";
               for(var i=0;i<total_result.length;i++)
               {
-                  result_string+="多边形编号："+i+"<br>";
+                  result_string+="The number of the polygon："+i+"<br>";
                   result_string+=total_result[i][1]+"<br>";
               }
               document.getElementById("demo").innerHTML = result_string;
