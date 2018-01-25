@@ -1,23 +1,24 @@
 <html>
 <head>
     <title>Map Projection</title>
+    <meta charset="UTF-8">
 </head>
     <body>
         <p>
-            ¶ÁÈ¡ÖĞ¹úµØÍ¼:<input type="file" id="fileinput" >
-            <input type="submit" id="button4"  value="È·¶¨" onclick="readChinafile()">
-            <input type="submit" id="button2"  value="»æÖÆÖĞ¹úµØÍ¼" onclick="paint_china_map(canvas1)"> 
+            è¯»å–ä¸­å›½åœ°å›¾:<input type="file" id="fileinput" >
+            <input type="submit" id="button4"  value="ç¡®å®š" onclick="readChinafile()">
+            <input type="submit" id="button2"  value="ç»˜åˆ¶ä¸­å›½åœ°å›¾" onclick="paint_china_map(canvas1)"> 
         </p>
         <p>
-            ¶ÁÈ¡ÊÀ½çµØÍ¼:<input type="file" id="fileinput2" >
-            <input type="submit" id="button5"  value="È·¶¨" onclick="readWorldfile()">
-            <input type="submit" id="button6"  value="»æÖÆÊÀ½çµØÍ¼" onclick="paint_world_map(canvas1)"> 
+            è¯»å–ä¸–ç•Œåœ°å›¾:<input type="file" id="fileinput2" >
+            <input type="submit" id="button5"  value="ç¡®å®š" onclick="readWorldfile()">
+            <input type="submit" id="button6"  value="ç»˜åˆ¶ä¸–ç•Œåœ°å›¾" onclick="paint_world_map(canvas1)"> 
         </p> 
         <p>
-            <input type="submit" id="button7" value="±±¾©54×ªÀ¼²®ÌØ" onclick="beijing_to_lambert(canvas1)">
-            <input type="submit" id="button8" value="±±¾©54×ªÄ«¿¨ÍĞ" onclick="beijing_to_mercator(canvas1)">
-            <input type="submit" id="button9" value="WGS84×ªÄ«¿¨ÍĞ" onclick="WGS_to_mercator(canvas1)">
-            <input type="submit" id="button12" value="±±¾©µ½°ÍÀèµÄ´óÔ²º½Ïß" onclick="Beijing_to_Paris(canvas1)">
+            <input type="submit" id="button7" value="åŒ—äº¬54è½¬å…°ä¼¯ç‰¹" onclick="beijing_to_lambert(canvas1)">
+            <input type="submit" id="button8" value="åŒ—äº¬54è½¬å¢¨å¡æ‰˜" onclick="beijing_to_mercator(canvas1)">
+            <input type="submit" id="button9" value="WGS84è½¬å¢¨å¡æ‰˜" onclick="WGS_to_mercator(canvas1)">
+            <input type="submit" id="button12" value="åŒ—äº¬åˆ°å·´é»çš„å¤§åœ†èˆªçº¿" onclick="Beijing_to_Paris(canvas1)">
         </p> 
         <div id="tt">
             
@@ -36,7 +37,7 @@
             var pen;
             var count;
             
-            //´æ´¢ÖĞ¹úµØÍ¼×ø±ê
+            //å­˜å‚¨ä¸­å›½åœ°å›¾åæ ‡
             var pointx_list=new Array();
             var pointy_list=new Array();
             for(var i=0;i<MAXAMOUNT;i++)
@@ -44,7 +45,7 @@
                 pointx_list[i]=-99999;
                 pointy_list[i]=-99999;
             }
-            //´æ´¢ÊÀ½çµØÍ¼×ø±ê
+            //å­˜å‚¨ä¸–ç•Œåœ°å›¾åæ ‡
             var pointx2_list=new Array();
             var pointy2_list=new Array();
             for(var i=0;i<MAXAMOUNT;i++)
@@ -52,7 +53,7 @@
                 pointx2_list[i]=-99999;
                 pointy2_list[i]=-99999;
             }
-            //´æ´¢»æÖÆÊ±µÄ×ø±ê
+            //å­˜å‚¨ç»˜åˆ¶æ—¶çš„åæ ‡
             var paipointx_list=new Array();
             var paipointy_list=new Array();
             for(var i=0;i<MAXAMOUNT;i++)
@@ -68,7 +69,7 @@
                 paipointy2_list[i]=-99999;
             }
             
-            //ÖĞ¹úÍø¸ñÏß¼°Æä×ª»»Ö®ºóµÄÍø¸ñ×ø±ê
+            //ä¸­å›½ç½‘æ ¼çº¿åŠå…¶è½¬æ¢ä¹‹åçš„ç½‘æ ¼åæ ‡
             var locationx_list=new Array();
             var locationy_list=new Array();
             var pailocationx_list=new Array();
@@ -80,7 +81,7 @@
                 pailocationx_list[i]=-99999;
                 pailocationy_list[i]=-99999;
             }
-            //ÊÀ½çÍø¸ñÏß¼°Æä×ª»»Ö®ºóµÄÍø¸ñ×ø±ê
+            //ä¸–ç•Œç½‘æ ¼çº¿åŠå…¶è½¬æ¢ä¹‹åçš„ç½‘æ ¼åæ ‡
             var locationx2_list=new Array();
             var locationy2_list=new Array();
             var pailocationx2_list=new Array();
@@ -92,10 +93,10 @@
                 pailocationx2_list[i]=-99999;
                 pailocationy2_list[i]=-99999;
             }
-            //¶ÁÈ¡Íø¸ñÎÄ¼ş
+            //è¯»å–ç½‘æ ¼æ–‡ä»¶
             function readgrid()
             {
-                //ÖĞ¹ú
+                //ä¸­å›½
                 var Cfile=document.getElementById("fileinput3").files[0];;
                 var Creader=new FileReader();
                 Creader.readAsText(Cfile);
@@ -120,7 +121,7 @@
                     }
                 }
             
-                //ÊÀ½ç
+                //ä¸–ç•Œ
                 var Cfile=document.getElementById("fileinput4").files[0];;
                 var Creader=new FileReader();
                 Creader.readAsText(Cfile);
@@ -146,7 +147,7 @@
                 }
             }
             
-            //¶ÁÈ¡ÖĞ¹úµØÍ¼ÎÄ¼ş
+            //è¯»å–ä¸­å›½åœ°å›¾æ–‡ä»¶
             function readChinafile()
             {
                 
@@ -174,7 +175,7 @@
                 }
     
             } 
-            //¶ÁÈ¡ÊÀ½çµØÍ¼ÎÄ¼ş
+            //è¯»å–ä¸–ç•Œåœ°å›¾æ–‡ä»¶
             function readWorldfile()
             {
                 var file2=document.getElementById("fileinput2").files[0];
@@ -203,13 +204,13 @@
                 } 
             } 
            
-            //¶ÁÈ¡»­±ÊµÄÑÕÉ«
+            //è¯»å–ç”»ç¬”çš„é¢œè‰²
             function read_pen()
             {
                 pen="black";
                 count=2;
             }
-            //»æÖÆÍø¸ñ
+            //ç»˜åˆ¶ç½‘æ ¼
             function draw_grid(canvas)
             {
               
@@ -251,7 +252,7 @@
               }
             }
             
-            //»æÖÆÖĞ¹úÍø¸ñ
+            //ç»˜åˆ¶ä¸­å›½ç½‘æ ¼
             function china_grid(canvas)
             {
               canvas.width = 721;
@@ -277,7 +278,7 @@
                 }
               }
             }
-            //»æÖÆÊÀ½çÍø¸ñ
+            //ç»˜åˆ¶ä¸–ç•Œç½‘æ ¼
             function world_grid(canvas)
             {
               canvas.width = 721;
@@ -310,7 +311,7 @@
             }
  
             
-            //»æÖÆÖĞ¹úµØÍ¼
+            //ç»˜åˆ¶ä¸­å›½åœ°å›¾
             function paint_china_map(canvas)
             { 
                 read_pen();
@@ -345,7 +346,7 @@
                     
                 }
             }
-            //»æÖÆÊÀ½çµØÍ¼
+            //ç»˜åˆ¶ä¸–ç•Œåœ°å›¾
             function paint_world_map(canvas)
             {
                 read_pen();
@@ -380,10 +381,10 @@
                     
                 }
             }
-            //±±¾©54×ªÀ¼²®ÌØÍ¶Ó°,Í¬Ê±»æÖÆ¾­Î³Íø¸ñ
+            //åŒ—äº¬54è½¬å…°ä¼¯ç‰¹æŠ•å½±,åŒæ—¶ç»˜åˆ¶ç»çº¬ç½‘æ ¼
             function beijing_to_lambert(canvas)
             {
-                //À¼²®ÌØÍ¶Ó°×ª»»¹«Ê½
+                //å…°ä¼¯ç‰¹æŠ•å½±è½¬æ¢å…¬å¼
                 var B0=0,L0=105,B1=20,B2=40,a=6378245;
                 var e=Math.sqrt(0.006693421622966);
                 var mb1=(Math.cos(B1*Math.PI/180))/(Math.sqrt(1-e*e*(Math.sin(B1*Math.PI/180))*(Math.sin(B1*Math.PI/180))));
@@ -414,7 +415,7 @@
                     }
                 }
                 
-                //»æÖÆÍø¸ñ×ª»»½á¹û
+                //ç»˜åˆ¶ç½‘æ ¼è½¬æ¢ç»“æœ
                 for(var i=0;i<MAXAMOUNT;i++)
                 {
                     if(pailocationx_list[i]!=-99999)
@@ -424,7 +425,7 @@
                     }
                 }
                 china_grid(canvas);
-                //»æÖÆÍ¶Ó°×ª»»½á¹û
+                //ç»˜åˆ¶æŠ•å½±è½¬æ¢ç»“æœ
                 for(var i=0;i<MAXAMOUNT;i++)
                 {
                     if(paipointx_list[i]!=-99999)
@@ -450,10 +451,10 @@
                     
                 }
             }
-            //±±¾©54×ªÄ«¿¨ÍĞ,Í¬Ê±»æÖÆ¾­Î³Íø¸ñ
+            //åŒ—äº¬54è½¬å¢¨å¡æ‰˜,åŒæ—¶ç»˜åˆ¶ç»çº¬ç½‘æ ¼
             function beijing_to_mercator(canvas)
             {
-                //Ä«¿¨ÍĞÍ¶Ó°×ª»»¹«Ê½
+                //å¢¨å¡æ‰˜æŠ•å½±è½¬æ¢å…¬å¼
                 var earthRad=6378245;
                 for(var i=0;i<MAXAMOUNT;i++)
                 {
@@ -470,7 +471,7 @@
                         pailocationy_list[i]=earthRad/2*Math.log((1+Math.sin(aa))/(1-Math.sin(aa)));
                     }
                 }
-                //»æÖÆÍø¸ñ×ª»»½á¹û
+                //ç»˜åˆ¶ç½‘æ ¼è½¬æ¢ç»“æœ
                 for(var i=0;i<MAXAMOUNT;i++)
                 {
                     if(pailocationx_list[i]!=-99999)
@@ -480,7 +481,7 @@
                     }
                 }
                 china_grid(canvas);
-                //»æÖÆÍ¶Ó°×ª»»½á¹û
+                //ç»˜åˆ¶æŠ•å½±è½¬æ¢ç»“æœ
                 for(var i=0;i<MAXAMOUNT;i++)
                 {
                     if(paipointx_list[i]!=-99999)
@@ -506,10 +507,10 @@
                     
                 }
             }
-            //WGS84×ªÄ«¿¨ÍĞ,Í¬Ê±»æÖÆ¾­Î³Íø¸ñ
+            //WGS84è½¬å¢¨å¡æ‰˜,åŒæ—¶ç»˜åˆ¶ç»çº¬ç½‘æ ¼
             function WGS_to_mercator(canvas)
             {
-                //Ä«¿¨ÍĞÍ¶Ó°×ª»»¹«Ê½
+                //å¢¨å¡æ‰˜æŠ•å½±è½¬æ¢å…¬å¼
                 var earthRad=6378137;
                 for(var i=0;i<MAXAMOUNT;i++)
                 {
@@ -526,7 +527,7 @@
                         pailocationy2_list[i]=earthRad/2*Math.log((1+Math.sin(aa))/(1-Math.sin(aa)));
                     }
                 }
-                //»æÖÆÍ¶Ó°×ª»»½á¹û
+                //ç»˜åˆ¶æŠ•å½±è½¬æ¢ç»“æœ
                 for(var i=0;i<MAXAMOUNT;i++)
                 {
                     if(pailocationx2_list[i]!=-99999)
@@ -535,7 +536,7 @@
                         pailocationy2_list[i]=360-(pailocationy2_list[i]/100000+160)-10;
                     }
                 }
-                //»æÖÆÍø¸ñ
+                //ç»˜åˆ¶ç½‘æ ¼
                 canvas.width = 721;
                 canvas.height = 561;
                 if(canvas.getContext)
@@ -560,7 +561,7 @@
                 }
                 
                 
-                //»æÖÆÍ¶Ó°×ª»»½á¹û
+                //ç»˜åˆ¶æŠ•å½±è½¬æ¢ç»“æœ
                 for(var i=0;i<MAXAMOUNT;i++)
                 {
                     if(paipointx2_list[i]!=-99999)
@@ -586,7 +587,7 @@
                     
                 }
             }
-            //´óÔ²¹ì¼£ÖĞĞÄµã¼ÆËã
+            //å¤§åœ†è½¨è¿¹ä¸­å¿ƒç‚¹è®¡ç®—
             function dayuan_middle(lat1,lon1,lat2,lon2)
             {
                 var temp=[0,0];
@@ -598,7 +599,7 @@
                 temp[1]=lonm;
                 return temp;
             }
-            //±±¾©µ½°ÍÀèµÄ´óÔ²¹ì¼£
+            //åŒ—äº¬åˆ°å·´é»çš„å¤§åœ†è½¨è¿¹
             function Beijing_to_Paris(canvas)
             {
                 var Lat1=39.8,Lon1=116.4,Lat2=48.52,Lon2=2.2;
@@ -620,7 +621,7 @@
                 Lon9=temp[1];Lat9=temp[0];
                 var dayuanx=[Lon1,Lon6,Lon4,Lon7,Lon3,Lon8,Lon5,Lon9,Lon2];
                 var dayuany=[Lat1,Lat6,Lat4,Lat7,Lat3,Lat8,Lat5,Lat9,Lat2];
-                //Ä«¿¨ÍĞÍ¶Ó°×ª»»¹«Ê½
+                //å¢¨å¡æ‰˜æŠ•å½±è½¬æ¢å…¬å¼
                 var earthRad=6378245;
                 for(var i=0;i<9;i++)
                 {
@@ -628,7 +629,7 @@
                         var aa=dayuany[i]*Math.PI/180;
                         dayuany[i]=earthRad/2*Math.log((1+Math.sin(aa))/(1-Math.sin(aa)));
                 }
-                //»æÖÆÍ¶Ó°×ª»»½á¹û
+                //ç»˜åˆ¶æŠ•å½±è½¬æ¢ç»“æœ
                 for(var i=0;i<9;i++)
                 {
                         dayuany[i]=360-(dayuany[i]/100000+160)-70;
